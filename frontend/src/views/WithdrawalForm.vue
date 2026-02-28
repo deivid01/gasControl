@@ -280,7 +280,7 @@ const newWithdrawal = () => {
                   :class="
                     form.gas_type === gt.id ? 'text-gasBlue' : 'text-gray-700'
                   "
-                  >Gás {{ gt.name }}</span
+                  >{{ gt.name }}</span
                 >
                 <div
                   v-if="form.gas_type === gt.id"
