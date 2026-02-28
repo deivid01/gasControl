@@ -1,3 +1,6 @@
+import csv
+import io
+from datetime import datetime
 from django.db import transaction
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
@@ -54,6 +57,8 @@ class WithdrawalViewSet(viewsets.ModelViewSet):
             return [permissions.IsAuthenticated(), CanCreateWithdrawal()]
         elif self.action in ['update', 'partial_update', 'destroy']:
             return [permissions.IsAuthenticated(), IsEncarregadoOrMaster()]
+        elif self.action == 'import_legacy':
+            return [permissions.IsAuthenticated(), IsMasterOrReadOnly()]
         return [permissions.IsAuthenticated()]
 
     @transaction.atomic
@@ -120,6 +125,63 @@ class WithdrawalViewSet(viewsets.ModelViewSet):
         } for h in paginated_history]
         
         return paginator.get_paginated_response(data)
+
+    @action(detail=False, methods=['post'], parser_classes=[])
+    def import_legacy(self, request):
+        # Master already checked by permissions, but double check
+        if request.user.role != 'MASTER':
+            return Response({"error": "Apenas Masters podem importar dados."}, status=status.HTTP_403_FORBIDDEN)
+            
+        csv_file = request.FILES.get('file')
+        if not csv_file:
+            return Response({"error": "Nenhum arquivo CSV anexado."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            file_data = csv_file.read().decode('utf-8-sig') # Handle BOM
+            csv_reader = csv.DictReader(io.StringIO(file_data), delimiter=';')
+            
+            imported_count = 0
+            with transaction.atomic():
+                for row in csv_reader:
+                    # Expected Layout: Data;Loja;PDV;Operador;Cliente;Gás;Quantidade
+                    date_str = row.get('Data', '').strip()
+                    store_name = row.get('Loja', '').strip()
+                    pdv = row.get('PDV', '').strip()
+                    operator = row.get('Operador', '').strip()
+                    client = row.get('Cliente', '').strip()
+                    gas_name = row.get('Gás', '').strip()
+                    qtd_str = row.get('Quantidade', '1').strip()
+                    
+                    if not store_name or not gas_name or not client:
+                        continue
+                        
+                    # Find instances
+                    store, _ = Store.objects.get_or_create(name=store_name)
+                    gas_type, _ = GasType.objects.get_or_create(name=gas_name)
+                    qtd = int(qtd_str) if qtd_str.isdigit() else 1
+                    
+                    try:
+                        record_date = datetime.strptime(date_str, '%d/%m/%Y %H:%M')
+                    except ValueError:
+                        record_date = datetime.now()
+                        
+                    w = Withdrawal.objects.create(
+                        store=store,
+                        pdv=pdv,
+                        operator=operator,
+                        retriever_name=client,
+                        gas_type=gas_type,
+                        quantity=qtd,
+                        created_by=request.user
+                    )
+                    # Override created_at for historical accuracy
+                    Withdrawal.objects.filter(pk=w.pk).update(created_at=record_date)
+                    imported_count += 1
+                    
+            return Response({"message": f"Importação concluída. Recebidos {imported_count} registros antigos."}, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response({"error": f"Erro interno ao processar CSV: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CustomUser.objects.all()
