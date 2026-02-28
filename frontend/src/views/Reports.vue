@@ -49,15 +49,47 @@ const getActionType = (type) => {
         default: return { label: 'DESCONHECIDO', color: 'bg-gray-100 text-gray-700' }
     }
 }
+
+const printA4 = () => {
+    window.print();
+}
 </script>
 
+<style scoped>
+@media print {
+  body {
+    background-color: white !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .no-print-layout {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+</style>
+
 <template>
-  <div class="h-full flex flex-col gap-6">
-    <div class="flex items-center justify-between">
+  <div class="h-full flex flex-col gap-6 print:block print:p-0">
+    <div class="flex items-center justify-between non-printable">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Logs de Auditoria</h1>
             <p class="text-gray-500 text-sm mt-1">Histórico completo de ações no sistema de retiradas.</p>
         </div>
+        <button 
+            @click="printA4"
+            class="bg-gasBlue hover:bg-gasBlueDark text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow flex items-center gap-2 transition-all active:scale-95"
+        >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Imprimir A4
+        </button>
+    </div>
+
+    <!-- Print Header Only -->
+    <div class="hidden print:block mb-6 text-center">
+        <h1 class="text-2xl font-bold text-black border-b border-gray-400 pb-2">Relatório Consolidado de Retiradas e Estoque</h1>
+        <p class="text-sm mt-2 text-gray-700">Emitido em: {{ new Date().toLocaleString('pt-BR') }}</p>
     </div>
 
     <!-- Error State -->
@@ -72,7 +104,7 @@ const getActionType = (type) => {
     </div>
 
     <!-- Table content -->
-    <div v-else class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div v-else class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden no-print-layout print:shadow-none print:border-none">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -116,7 +148,7 @@ const getActionType = (type) => {
         </div>
         
         <!-- Pagination UI -->
-        <div v-if="nextUrl" class="p-4 border-t border-gray-100 bg-gray-50 flex justify-center">
+        <div v-if="nextUrl" class="p-4 border-t border-gray-100 bg-gray-50 flex justify-center non-printable">
             <button 
                 @click="loadMore" 
                 :disabled="loadingMore"
