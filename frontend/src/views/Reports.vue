@@ -90,24 +90,21 @@ const handleFileUpload = async (event) => {
 }
 </script>
 
-<style scoped>
+<style>
 @media print {
   body {
     background-color: white !important;
   }
-  .print-only {
+  .printable-container {
     display: block !important;
-  }
-  .no-print-layout {
-    box-shadow: none !important;
-    border: none !important;
+    height: auto !important;
   }
 }
 </style>
 
 <template>
-  <div class="h-full flex flex-col gap-6 print:block print:p-0">
-    <div class="flex items-center justify-between non-printable">
+  <div class="h-full flex flex-col gap-6 printable-container">
+    <div class="flex items-center justify-between non-printable print:hidden">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Logs de Auditoria</h1>
             <p class="text-gray-500 text-sm mt-1">Histórico completo de ações no sistema de retiradas.</p>
@@ -153,9 +150,9 @@ const handleFileUpload = async (event) => {
     </div>
 
     <!-- Table content -->
-    <div v-else class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden no-print-layout print:shadow-none print:border-none">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+    <div v-else class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden no-print-layout print:shadow-none print:border-none print:overflow-visible">
+        <div class="overflow-x-auto print:overflow-visible">
+            <table class="w-full text-left border-collapse print:text-xs">
                 <thead>
                     <tr class="bg-gray-50 border-b border-gray-100 text-gray-500 text-sm uppercase tracking-wider">
                         <th class="p-4 font-semibold whitespace-nowrap">Data/Hora</th>
@@ -197,7 +194,7 @@ const handleFileUpload = async (event) => {
         </div>
         
         <!-- Pagination UI -->
-        <div v-if="nextUrl" class="p-4 border-t border-gray-100 bg-gray-50 flex justify-center non-printable">
+        <div v-if="nextUrl" class="p-4 border-t border-gray-100 bg-gray-50 flex justify-center non-printable print:hidden">
             <button 
                 @click="loadMore" 
                 :disabled="loadingMore"
