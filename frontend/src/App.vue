@@ -20,8 +20,8 @@ const logout = () => {
       </div>
       <div class="flex gap-4 text-sm font-medium items-center">
          <span class="hidden sm:inline text-gray-500">Olá, {{ authStore.user?.first_name || authStore.user?.username }}</span>
-         <router-link to="/" class="text-gray-600 hover:text-gasBlue transition-colors px-2 py-1 rounded-md">Retiradas</router-link>
-         <router-link v-if="authStore.user?.role === 'MASTER' || authStore.user?.role === 'RELATORIO'" to="/reports" class="text-gray-600 hover:text-gasBlue transition-colors px-2 py-1 rounded-md">Auditoria</router-link>
+         <router-link to="/" class="text-gray-600 hover:text-gasBlue transition-colors px-2 py-1 rounded-md">Lojas</router-link>
+         <router-link v-if="authStore.user?.role === 'MASTER' || authStore.user?.role === 'ENCARREGADO'" to="/reports" class="text-gray-600 hover:text-gasBlue transition-colors px-2 py-1 rounded-md">Auditoria</router-link>
          <button @click="logout" class="text-red-500 hover:bg-red-50 transition-colors px-3 py-1.5 rounded-md flex items-center gap-1">
              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
              <span class="hidden sm:inline">Sair</span>

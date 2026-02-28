@@ -3,6 +3,9 @@ import { useAuthStore } from '../stores/auth'
 
 import Login from '../views/Login.vue'
 import StoreSelection from '../views/StoreSelection.vue'
+import StoreMenu from '../views/StoreMenu.vue'
+import StoreWithdrawals from '../views/StoreWithdrawals.vue'
+import StoreReprint from '../views/StoreReprint.vue'
 import WithdrawalForm from '../views/WithdrawalForm.vue'
 import Reports from '../views/Reports.vue'
 
@@ -20,16 +23,34 @@ const routes = [
         meta: { requiresAuth: true }
     },
     {
-        path: '/withdraw/:storeId',
+        path: '/loja/:storeId',
+        name: 'StoreMenu',
+        component: StoreMenu,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/loja/:storeId/registro',
         name: 'WithdrawalForm',
         component: WithdrawalForm,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/loja/:storeId/retirados',
+        name: 'StoreWithdrawals',
+        component: StoreWithdrawals,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/loja/:storeId/reimprimir',
+        name: 'StoreReprint',
+        component: StoreReprint,
         meta: { requiresAuth: true }
     },
     {
         path: '/reports',
         name: 'Reports',
         component: Reports,
-        meta: { requiresAuth: true, roles: ['MASTER', 'RELATORIO'] }
+        meta: { requiresAuth: true, roles: ['MASTER', 'ENCARREGADO'] }
     }
 ]
 

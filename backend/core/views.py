@@ -32,6 +32,13 @@ class WithdrawalViewSet(viewsets.ModelViewSet):
     serializer_class = WithdrawalSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        queryset = Withdrawal.objects.all().order_by('-created_at')
+        store_id = self.request.query_params.get('store', None)
+        if store_id is not None:
+            queryset = queryset.filter(store__id=store_id)
+        return queryset
+
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [permissions.IsAuthenticated(), IsEncarregadoOrMaster()]
@@ -42,7 +49,7 @@ class WithdrawalViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def history(self, request):
-        if request.user.role not in ['MASTER', 'RELATORIO']:
+        if request.user.role not in ['MASTER', 'ENCARREGADO']:
             return Response({"error": "Acesso negado"}, status=403)
             
         history = Withdrawal.history.all().order_by('-history_date')

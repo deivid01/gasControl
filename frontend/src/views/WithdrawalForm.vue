@@ -78,7 +78,7 @@ const newWithdrawal = () => {
 <template>
   <div class="h-full relative overflow-x-hidden">
     <button
-      @click="router.push('/')"
+      @click="router.push(`/loja/${storeId}`)"
       class="non-printable inline-flex items-center text-sm font-medium text-gasBlue hover:text-gasBlue/80 mb-6 group transition-colors"
     >
       <svg
@@ -93,7 +93,7 @@ const newWithdrawal = () => {
           clip-rule="evenodd"
         />
       </svg>
-      Voltar para Lojas
+      Menu da Loja
     </button>
 
     <div
@@ -173,10 +173,10 @@ const newWithdrawal = () => {
             Imprimir Comprovante
           </button>
           <button
-            @click="newWithdrawal"
+            @click="router.push(`/loja/${storeId}`)"
             class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-6 py-3.5 rounded-xl font-bold transition-all active:scale-95"
           >
-            Nova Retirada
+            Menu da Loja
           </button>
         </div>
       </div>

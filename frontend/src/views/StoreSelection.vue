@@ -11,7 +11,7 @@ onMounted(() => {
 })
 
 const selectStore = (storeId) => {
-  router.push(`/withdraw/${storeId}`)
+  router.push(`/loja/${storeId}`)
 }
 </script>
 
