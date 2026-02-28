@@ -17,6 +17,12 @@ class IsEncarregadoOrMaster(permissions.BasePermission):
             return True
         return request.method in permissions.SAFE_METHODS
 
+class CanCreateWithdrawal(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user.role in ['MASTER', 'ENCARREGADO', 'OPERADOR']:
+            return True
+        return request.method in permissions.SAFE_METHODS
+
 class StoreViewSet(viewsets.ModelViewSet):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
@@ -40,7 +46,9 @@ class WithdrawalViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+        if self.action == 'create':
+            return [permissions.IsAuthenticated(), CanCreateWithdrawal()]
+        elif self.action in ['update', 'partial_update', 'destroy']:
             return [permissions.IsAuthenticated(), IsEncarregadoOrMaster()]
         return [permissions.IsAuthenticated()]
 
