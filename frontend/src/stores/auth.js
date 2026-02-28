@@ -10,8 +10,8 @@ export const useAuthStore = defineStore('auth', {
         async login(username, password) {
             try {
                 const response = await api.post('token/', { username, password });
-                localStorage.setItem('access_token', response.data.access);
-                localStorage.setItem('refresh_token', response.data.refresh);
+                sessionStorage.setItem('access_token', response.data.access);
+                sessionStorage.setItem('refresh_token', response.data.refresh);
                 this.isAuthenticated = true;
                 await this.fetchUser();
                 return true;
@@ -32,8 +32,8 @@ export const useAuthStore = defineStore('auth', {
         logout() {
             this.user = null;
             this.isAuthenticated = false;
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
+            sessionStorage.removeItem('access_token');
+            sessionStorage.removeItem('refresh_token');
         }
     }
 });

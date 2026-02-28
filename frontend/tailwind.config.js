@@ -7,8 +7,10 @@ export default {
     theme: {
         extend: {
             colors: {
-                gasBlue: '#1D4ED8',
-                gasNacional: '#F59E0B',
+                gasBlue: '#2A4C96',
+                gasBlueDark: '#1a3266',
+                gasBlueLight: '#1AA8E8',
+                gasBrandRed: '#E1040E',
             }
         },
     },

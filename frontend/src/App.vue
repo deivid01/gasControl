@@ -1,6 +1,7 @@
 <script setup>
 import { useAuthStore } from './stores/auth'
 import { useRouter } from 'vue-router'
+import { onMounted, onUnmounted } from 'vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -9,6 +10,43 @@ const logout = () => {
   authStore.logout()
   router.push('/login')
 }
+
+// Inactivity Timeout Logic (10 minutes = 600000 ms)
+let timeoutId = null;
+
+const resetTimer = () => {
+    if (timeoutId) clearTimeout(timeoutId);
+    if (authStore.isAuthenticated) {
+        timeoutId = setTimeout(() => {
+            console.log("Logged out due to 10 minutes of inactivity.");
+            logout();
+        }, 600000); 
+    }
+}
+
+const setupInactivityTimer = () => {
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    window.addEventListener('click', resetTimer);
+    window.addEventListener('scroll', resetTimer);
+}
+
+const cleanupInactivityTimer = () => {
+    window.removeEventListener('mousemove', resetTimer);
+    window.removeEventListener('keydown', resetTimer);
+    window.removeEventListener('click', resetTimer);
+    window.removeEventListener('scroll', resetTimer);
+    if (timeoutId) clearTimeout(timeoutId);
+}
+
+onMounted(() => {
+    setupInactivityTimer();
+    resetTimer(); // Start the timer initial countdown
+});
+
+onUnmounted(() => {
+    cleanupInactivityTimer();
+});
 </script>
 
 <template>

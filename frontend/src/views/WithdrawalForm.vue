@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useDataStore } from "../stores/data";
+import { useAuthStore } from "../stores/auth";
 import api from "../api";
 
 import ReceiptTemplate from "../components/ReceiptTemplate.vue";
@@ -9,6 +10,7 @@ import ReceiptTemplate from "../components/ReceiptTemplate.vue";
 const route = useRoute();
 const router = useRouter();
 const dataStore = useDataStore();
+const authStore = useAuthStore();
 
 const storeId = parseInt(route.params.storeId);
 
@@ -36,9 +38,12 @@ onMounted(() => {
 });
 
 const submitWithdrawal = async () => {
+  // O Operador será sempre o usuário logado no momento do preenchimento
+  const activeOperator = authStore.user?.first_name || authStore.user?.username || "Operador Desconhecido";
+  form.value.operator = activeOperator;
+
   if (
     !form.value.pdv ||
-    !form.value.operator ||
     !form.value.retriever_name ||
     !form.value.gas_type
   )
@@ -203,19 +208,15 @@ const newWithdrawal = () => {
             />
           </div>
 
-          <!-- Operador -->
-          <div class="space-y-1.5 focus-within:text-gasBlue">
-            <label
-              class="text-sm font-bold text-gray-700 block transition-colors"
-              >Operador</label
-            >
-            <input
-              v-model="form.operator"
-              type="text"
-              required
-              placeholder="Nome do operador"
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gasBlue/30 focus:border-gasBlue transition-all text-gray-900 font-medium"
-            />
+          <div class="space-y-1.5 pt-7">
+            <span class="text-sm font-bold text-gray-500 block">Identificação do Operador</span>
+            <div class="flex items-center gap-2 p-3 bg-blue-50/50 border border-blue-100 rounded-xl text-gasBlue font-bold shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                </svg>
+                {{ authStore.user?.first_name || authStore.user?.username || "Carregando..." }}
+            </div>
+            <p class="text-xs text-gray-400 mt-1">* Registrado automaticamente via perfil de login.</p>
           </div>
         </div>
 
