@@ -10,6 +10,22 @@ const username = ref('')
 const password = ref('')
 const errorMsg = ref('')
 const isLoading = ref(false)
+const showUserModal = ref(false)
+
+const predefinedUsers = [
+  { name: 'Deivid', username: 'deivid', role: 'MASTER', color: 'bg-red-50 text-gasBrandRed' },
+  { name: 'Wellington', username: 'wellington', role: 'MASTER', color: 'bg-red-50 text-gasBrandRed' },
+  { name: 'Paulo', username: 'paulo', role: 'MASTER', color: 'bg-red-50 text-gasBrandRed' },
+  { name: 'Sandra', username: 'sandra', role: 'ENCARREGADO', color: 'bg-blue-50 text-gasBlue' },
+  { name: 'Alessandra', username: 'alessandra', role: 'ENCARREGADO', color: 'bg-blue-50 text-gasBlue' },
+  { name: 'Yasmin', username: 'yasmin', role: 'OPERADOR', color: 'bg-indigo-50 text-indigo-600' },
+  { name: 'Otilia', username: 'otilia', role: 'OPERADOR', color: 'bg-indigo-50 text-indigo-600' },
+]
+
+const selectUser = (selectedUsername) => {
+  username.value = selectedUsername
+  showUserModal.value = false
+}
 
 const handleLogin = async () => {
   isLoading.value = true
@@ -38,15 +54,18 @@ const handleLogin = async () => {
       </div>
 
       <form @submit.prevent="handleLogin" class="space-y-6">
-        <div>
+        <div class="relative">
           <label class="block text-sm font-semibold text-gray-700 mb-1">Usuário</label>
-          <input 
-            v-model="username" 
-            type="text" 
-            placeholder="master, encarregado..." 
-            class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-gasBlue/50 focus:border-gasBlue transition-all"
-            required
-          />
+          <div 
+            @click="showUserModal = true"
+            class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 hover:bg-white focus:outline-none focus:ring-2 focus:ring-gasBlue/50 focus:border-gasBlue transition-all cursor-pointer flex justify-between items-center"
+          >
+            <span v-if="username" class="text-gray-900 font-medium">{{ username }}</span>
+            <span v-else class="text-gray-400">Clique para selecionar o usuário...</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
         </div>
 
         <div>
@@ -75,5 +94,60 @@ const handleLogin = async () => {
         </button>
       </form>
     </div>
+
+    <!-- User Selection Modal -->
+    <div v-if="showUserModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" @click.self="showUserModal = false">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <h3 class="font-bold text-gray-800">Selecione seu Usuário</h3>
+          <button @click="showUserModal = false" class="text-gray-400 hover:text-red-500 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="overflow-y-auto p-4 flex-grow custom-scrollbar">
+          <div class="grid grid-cols-1 gap-2">
+            <button 
+              v-for="u in predefinedUsers" 
+              :key="u.username"
+              @click="selectUser(u.username)"
+              type="button"
+              class="flex items-center p-3 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-all text-left group"
+            >
+              <div :class="`w-10 h-10 rounded-full flex items-center justify-center mr-3 font-bold text-sm ${u.color}`">
+                {{ u.name.charAt(0) }}
+              </div>
+              <div class="flex-grow">
+                <div class="font-bold text-gray-800 group-hover:text-gasBlue transition-colors">{{ u.name }}</div>
+                <div class="text-xs text-gray-400">{{ u.role }}</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 20px;
+}
+</style>
