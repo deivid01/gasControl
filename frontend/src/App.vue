@@ -50,8 +50,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-800">
-    <nav v-if="authStore.isAuthenticated" class="bg-white shadow-sm px-4 py-3 flex justify-between items-center sticky top-0 z-50">
+  <div class="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-800 print:block print:min-h-0 print:h-auto print:bg-white">
+    <nav v-if="authStore.isAuthenticated" class="bg-white shadow-sm px-4 py-3 flex justify-between items-center sticky top-0 z-50 print:hidden">
       <div class="flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gasBlue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2A10 10 0 1 0 22 12 10 10 0 0 0 12 2Z"></path><path d="M12 18a6 6 0 1 0-6-6"></path><path d="M12 14a2 2 0 1 0-2-2"></path></svg>
         <span class="font-bold text-lg tracking-tight">Gás<span class="text-gasBlue">Control</span></span>
@@ -67,7 +67,7 @@ onUnmounted(() => {
       </div>
     </nav>
 
-    <main class="flex-grow flex flex-col p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+    <main class="flex-grow flex flex-col p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full print:block print:p-0 print:m-0 print:max-w-none print:w-full">
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">
           <component :is="Component" />

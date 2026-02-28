@@ -1,6 +1,6 @@
 <template>
-  <div class="h-full bg-gray-50 flex flex-col items-center printable-container">
-    <div class="w-full max-w-2xl p-6 mt-4">
+  <div class="h-full bg-gray-50 flex flex-col items-center printable-container print:block print:h-auto print:bg-white">
+    <div class="w-full max-w-2xl p-6 mt-4 print:max-w-none print:w-full print:p-0 print:m-0">
         <div class="flex items-center justify-between pl-0 mb-6 non-printable print:hidden">
             <div class="flex items-center">
                 <router-link :to="`/loja/${storeId}`" class="text-gasBlue hover:text-gasBlueDark flex items-center font-medium transition-colors">

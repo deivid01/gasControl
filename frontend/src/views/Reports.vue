@@ -103,7 +103,7 @@ const handleFileUpload = async (event) => {
 </style>
 
 <template>
-  <div class="h-full flex flex-col gap-6 printable-container">
+  <div class="h-full flex flex-col gap-6 printable-container print:block print:h-auto print:gap-0">
     <div class="flex items-center justify-between non-printable print:hidden">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Logs de Auditoria</h1>
