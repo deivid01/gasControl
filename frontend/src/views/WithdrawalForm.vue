@@ -30,11 +30,27 @@ const form = ref({
 const isSubmitting = ref(false);
 const showSuccess = ref(false);
 const savedWithdrawal = ref(null);
+const stocks = ref([]);
+
+const fetchStocks = async () => {
+  try {
+    const response = await api.get(`stocks/?store=${storeId}`);
+    stocks.value = response.data.results || response.data;
+  } catch (error) {
+    console.error("Erro ao carregar estoques:", error);
+  }
+};
+
+const getGasStock = (gasId) => {
+  const stock = stocks.value.find((s) => s.gas_type === gasId);
+  return stock ? stock.quantity : 0;
+};
 
 onMounted(() => {
   if (dataStore.stores.length === 0) {
     dataStore.fetchReferenceData();
   }
+  fetchStocks();
 });
 
 const submitWithdrawal = async () => {
@@ -54,9 +70,11 @@ const submitWithdrawal = async () => {
     const response = await api.post("withdrawals/", form.value);
     savedWithdrawal.value = response.data;
     showSuccess.value = true;
+    fetchStocks(); // Atualiza o saldo após a retirada
   } catch (error) {
     console.error("Error creating withdrawal", error);
-    alert("Erro ao registrar retirada. Tente novamente.");
+    const errorMsg = error.response?.data?.error || "Erro ao registrar retirada. Tente novamente.";
+    alert(errorMsg);
   } finally {
     isSubmitting.value = false;
   }
@@ -279,6 +297,10 @@ const newWithdrawal = () => {
                       clip-rule="evenodd"
                     ></path>
                   </svg>
+                </div>
+                <!-- Estoque Badge -->
+                <div class="mt-1 text-xs font-bold" :class="getGasStock(gt.id) > 0 ? 'text-emerald-500' : 'text-red-500'">
+                  Estoque: {{ getGasStock(gt.id) }} un
                 </div>
               </div>
             </label>
