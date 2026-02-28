@@ -4,19 +4,36 @@ import api from '../api'
 
 const historyLogs = ref([])
 const loading = ref(true)
+const loadingMore = ref(false)
 const error = ref('')
+const nextUrl = ref(null)
 
-onMounted(async () => {
+const fetchLogs = async (url = 'withdrawals/history/?limit=50') => {
     try {
-        const response = await api.get('withdrawals/history/')
-        historyLogs.value = response.data
+        const response = await api.get(url)
+        if (url.includes('offset')) {
+            historyLogs.value = [...historyLogs.value, ...response.data.results]
+        } else {
+            historyLogs.value = response.data.results
+        }
+        nextUrl.value = response.data.next ? response.data.next.replace(api.defaults.baseURL, '') : null
     } catch (err) {
         console.error("Erro ao buscar histórico", err)
         error.value = 'Você não tem permissão para visualizar a auditoria ou ocorreu um erro.'
-    } finally {
-        loading.value = false
     }
+}
+
+onMounted(async () => {
+    await fetchLogs()
+    loading.value = false
 })
+
+const loadMore = async () => {
+    if (!nextUrl.value || loadingMore.value) return;
+    loadingMore.value = true;
+    await fetchLogs(nextUrl.value);
+    loadingMore.value = false;
+}
 
 const getFormattedDate = (dateString) => {
     if (!dateString) return '';
@@ -96,6 +113,18 @@ const getActionType = (type) => {
                     </tr>
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Pagination UI -->
+        <div v-if="nextUrl" class="p-4 border-t border-gray-100 bg-gray-50 flex justify-center">
+            <button 
+                @click="loadMore" 
+                :disabled="loadingMore"
+                class="px-6 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gasBlue shadow-sm hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+                <span v-if="loadingMore">Carregando...</span>
+                <span v-else>Carregar Mais Registros</span>
+            </button>
         </div>
     </div>
   </div>

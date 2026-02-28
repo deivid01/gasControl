@@ -1,6 +1,7 @@
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
 from .models import CustomUser, Store, GasType, Withdrawal
 from .serializers import CustomUserSerializer, StoreSerializer, GasTypeSerializer, WithdrawalSerializer
 
@@ -45,6 +46,10 @@ class WithdrawalViewSet(viewsets.ModelViewSet):
             return Response({"error": "Acesso negado"}, status=403)
             
         history = Withdrawal.history.all().order_by('-history_date')
+        
+        paginator = LimitOffsetPagination()
+        paginated_history = paginator.paginate_queryset(history, request)
+        
         data = [{
             'history_id': h.history_id,
             'history_date': h.history_date,
@@ -56,8 +61,9 @@ class WithdrawalViewSet(viewsets.ModelViewSet):
             'pdv': h.pdv,
             'operator': h.operator,
             'retriever_name': h.retriever_name
-        } for h in history]
-        return Response(data)
+        } for h in paginated_history]
+        
+        return paginator.get_paginated_response(data)
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CustomUser.objects.all()
